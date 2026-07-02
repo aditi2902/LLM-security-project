@@ -1,0 +1,12 @@
+{
+    "status": "success",
+    "data": {
+        "user_id": 12345,
+        "name": "Jane Smith",
+        "role": "admin",
+        "preferences": {
+            "theme": "dark",
+            "notifications": true
+        }
+    }
+}

@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+requests
+duckduckgo-search
+beautifulsoup4
+lxml
+pydantic
+python-dotenv
+orjson
+scikit-learn
+pandas
+loguru
+pytest
+ollama
+streamlit

@@ -1,0 +1,11 @@
+{
+    "content": "Zero-trust architecture is a security model based on the principle of maintaining strict access controls and not trusting anyone by default.",
+    "category": "cybersecurity",
+    "source": "safe_blog.html",
+    "trust_score": 95,
+    "utility": 90,
+    "risk": 5,
+    "longevity": 100,
+    "ttl": 31536000,
+    "creation_timestamp": 1704067200
+}
