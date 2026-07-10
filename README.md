@@ -69,7 +69,9 @@ sequenceDiagram
 * Node.js 18+
 * Groq / Gemini API Credentials (configured in `backend/.env`)
 
-### 1. Start the Backend (Port 8002)
+### Option A: Local Development Setup
+
+#### 1. Start the Backend (Port 8002)
 ```bash
 cd backend
 python -m venv myenv
@@ -79,13 +81,26 @@ python app.py
 ```
 *(The API will launch at http://localhost:8002)*
 
-### 2. Start the Frontend Dashboard
+#### 2. Start the Frontend Dashboard
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 *(Open http://localhost:5173 to access the control center)*
+
+### Option B: Containerized Setup (Docker Compose)
+If you prefer running the entire project inside containerized environments:
+
+1. Ensure your `.env` file is set up in the root directory (containing your API keys).
+2. Build and launch the services:
+   ```bash
+   docker-compose up --build
+   ```
+3. This spins up two containers:
+   * **Backend**: Binds container port 8002 to host port `8002`.
+   * **Frontend**: Binds container port 5173 to host port `5173`.
+4. Access the dashboard at http://localhost:5173.
 
 ---
 
