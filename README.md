@@ -118,6 +118,26 @@ If you prefer running the entire project inside containerized environments:
 
 ---
 
+## 🔬 How to Run the Secure CLI Agent Demonstration
+
+We have created a command-line utility [secure_agent_cli.py](file:///absolute/path/to/backend/secure_agent_cli.py) to simulate how an automated Bash AI Agent is hijacked by a hidden document injection, and how TrustLens stops it.
+
+### 1. Run the Unsecured Agent (Direct Cloud Connection)
+```bash
+cd backend
+python secure_agent_cli.py "Show my directories"
+```
+* **Result**: The agent is hijacked by the mock website instruction and generates a destructive command: `rm -rf /app/important_files`.
+
+### 2. Run the Secured Agent (Routed through TrustLens Proxy)
+First, ensure your TrustLens backend is running on port `8002`, then run:
+```bash
+python secure_agent_cli.py "Show my directories" --secure
+```
+* **Result**: TrustLens intercepts the payload at ingress, identifies the prompt injection bypass attempt, and blocks the request with `[BLOCKED BY TRUSTLENS]`, saving your terminal from execution.
+
+---
+
 ## 📁 Codebase Reference
 
 * [app.py](file:///absolute/path/to/backend/app.py): Entry point, CORS configuration, scheduler, and API routes.
