@@ -1379,7 +1379,7 @@ function App() {
                     value={query} onChange={e => setQuery(e.target.value)}
                     disabled={loading} autoComplete="off" />
                 </div>
-                <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".txt,.html,.htm,.json" style={{ display: 'none' }} />
+                <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".txt,.html,.htm,.json,.pdf" style={{ display: 'none' }} />
                 <button type="button" className="btn-secondary" onClick={() => fileInputRef.current.click()} disabled={loading} style={{
                   padding: '0.45rem 1rem', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em',
                   display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px'

@@ -78,3 +78,25 @@ def test_scan_document_endpoint():
     assert "raw_content" in data
     assert "blocked" in data
 
+def test_scan_pdf_endpoint():
+    from pypdf import PdfWriter
+    import io
+    
+    # Generate simple blank PDF
+    writer = PdfWriter()
+    writer.add_blank_page(width=100, height=100)
+    
+    pdf_bytes = io.BytesIO()
+    writer.write(pdf_bytes)
+    pdf_bytes.seek(0)
+    
+    response = client.post(
+        "/scan-document",
+        files={"file": ("test_inject.pdf", pdf_bytes.read(), "application/pdf")}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["filename"] == "test_inject.pdf"
+    assert "blocked" in data
+
+

@@ -255,6 +255,19 @@ async def scan_document_endpoint(file: UploadFile = File(...)):
             text_content = soup.get_text()
         except Exception:
             text_content = contents.decode("utf-8", errors="ignore")
+    elif filename.lower().endswith(".pdf"):
+        try:
+            import io
+            from pypdf import PdfReader
+            reader = PdfReader(io.BytesIO(contents))
+            pages = []
+            for page in reader.pages:
+                text = page.extract_text()
+                if text:
+                    pages.append(text)
+            text_content = "\n".join(pages)
+        except Exception as e:
+            text_content = f"Failed to parse PDF content: {str(e)}"
     else:
         text_content = contents.decode("utf-8", errors="ignore")
         
