@@ -70,12 +70,19 @@ Return ONLY valid JSON:
 
 def retrieve_and_validate_memories(current_context: str) -> list:
     """
-    Retrieves all memories and validates them before use.
-    Returns a list of safe memory strings.
+    Retrieves all memories, filters them by relevance (word overlap),
+    and validates them in parallel to prevent API rate limits and slow executions.
     """
-    all_memories = get_all_memories()
-    safe_memories = []
+    from concurrent.futures import ThreadPoolExecutor
     
+    all_memories = get_all_memories()
+    candidate_memories = []
+    
+    # Extract query words for simple keyword filtering
+    query_words = set(re.findall(r'\w+', current_context.lower()))
+    stop_words = {"what", "is", "the", "a", "an", "and", "or", "of", "to", "in", "for", "on", "with", "at", "by", "you", "me", "how", "can"}
+    meaningful_query_words = query_words - stop_words
+
     for mem in all_memories:
         # 1. Rule Engine
         if not run_retrieval_rule_engine(mem):
@@ -85,10 +92,33 @@ def retrieve_and_validate_memories(current_context: str) -> list:
         if not verify_trust(mem):
             continue
             
-        # 3. Gemini Evaluator
-        if not evaluate_memory_retrieval_gemini(mem, current_context):
-            continue
-            
-        safe_memories.append(mem.get("content"))
+        # 3. Quick Relevance Filter (text overlap)
+        content = mem.get("content", "")
+        content_words = set(re.findall(r'\w+', content.lower()))
+        overlap = meaningful_query_words.intersection(content_words)
+        
+        # If there's keyword overlap, or if it's a short conversational query, evaluate it
+        if overlap or len(meaningful_query_words) == 0:
+            candidate_memories.append(mem)
+
+    # Limit to top 3 candidates to avoid flooding the LLM
+    candidate_memories = candidate_memories[:3]
+    if not candidate_memories:
+        return []
+
+    # 4. Evaluate candidates in parallel
+    safe_memories = []
+    with ThreadPoolExecutor(max_workers=len(candidate_memories)) as executor:
+        futures = {
+            executor.submit(evaluate_memory_retrieval_gemini, mem, current_context): mem
+            for mem in candidate_memories
+        }
+        for future in futures:
+            mem = futures[future]
+            try:
+                if future.result():
+                    safe_memories.append(mem.get("content"))
+            except Exception as e:
+                print(f"Error validating memory: {e}")
         
     return safe_memories

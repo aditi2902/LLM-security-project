@@ -10,13 +10,28 @@ def execute_search_agent(query: str) -> str:
     """
     if query.lower().startswith("test:"):
         filename = query.split(":", 1)[1].strip()
-        filepath = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dataset", filename)
+        base_dataset_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dataset")
+        filepath = os.path.join(base_dataset_dir, filename)
+        
+        # Check direct or recursive file existence
+        if not os.path.exists(filepath):
+            found_path = None
+            for root, _, files in os.walk(base_dataset_dir):
+                for file in files:
+                    # Match exact filename, or match suffix to handle indexed files (e.g. contradictory_information.html -> 08_contradictory_information.html)
+                    if file.lower() == filename.lower() or file.lower().endswith(filename.lower()):
+                        found_path = os.path.join(root, file)
+                        break
+                if found_path:
+                    filepath = found_path
+                    break
+                    
         if os.path.exists(filepath):
             with open(filepath, "r", encoding="utf-8") as f:
                 content = f.read()
-            return f"[Source: Local Test File - {filename}]\n{content}"
+            return f"[Source: Local Test File - {os.path.basename(filepath)}]\n{content}"
         else:
-            return f"[Source: Error]\nTest file '{filename}' not found in dataset directory."
+            return f"[Source: Error]\nTest file '{filename}' not found recursively in dataset directory."
 
     if query.lower().startswith("http"):
         url = query.strip()

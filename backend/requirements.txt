@@ -13,3 +13,7 @@ loguru
 pytest
 ollama
 streamlit
+apscheduler
+groq
+sqlalchemy
+httpx

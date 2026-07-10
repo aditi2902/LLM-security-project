@@ -1,2 +1,12 @@
 .env
 backend/.env
+__pycache__/
+*.pyc
+myenv/
+node_modules/
+dist/
+trustlens.db
+*.db
+.DS_Store
+package-lock.json
+frontend/package-lock.json

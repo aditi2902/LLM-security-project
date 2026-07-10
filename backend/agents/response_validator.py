@@ -21,5 +21,10 @@ Return ONLY valid JSON with this exact structure, no markdown formatting:
 Response to analyze:
 {response_text}
 """
-    result = call_llm(prompt, model="deepseek", format_json=True)
+    result = call_llm(prompt, model="groq", format_json=True)
+    if isinstance(result, str):
+        try:
+            result = json.loads(result)
+        except json.JSONDecodeError:
+            pass
     return result

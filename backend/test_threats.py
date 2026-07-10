@@ -1,0 +1,51 @@
+import json
+from fastapi.testclient import TestClient
+from app import app
+from database import init_db, db_add_learned_rule, db_approve_rule, db_get_learned_rules, db_get_pending_rules
+
+client = TestClient(app)
+
+def test_init_db_and_schema():
+    # Verify DB initialization runs without error
+    init_db()
+
+def test_rules_endpoints():
+    import time
+    init_db()
+    # 1. Clean out existing rules by adding unique mock
+    uniq = str(time.time())
+    attack_text = f"test_adversarial_jailbreak_unique_payload_{uniq}"
+    rule_text = f"Block prompts attempting test_adversarial_jailbreak_unique_payload_{uniq}"
+    category = "JAILBREAK"
+    
+    # 2. Add rule
+    added = db_add_learned_rule(attack_text, rule_text, category, approved=False)
+    assert added is True
+    
+    # 3. Check pending rules
+    pending = db_get_pending_rules()
+    assert len(pending) > 0
+    rule_id = pending[0]["id"]
+    
+    # 4. Check API endpoint
+    response = client.get("/secops/rules/pending")
+    assert response.status_code == 200
+    assert "rules" in response.json()
+    
+    # 5. Approve rule
+    response = client.post("/secops/rules/approve", json={"rule_id": rule_id})
+    assert response.status_code == 200
+    assert response.json()["success"] is True
+    
+    # 6. Check active rules
+    response = client.get("/secops/rules/active")
+    assert response.status_code == 200
+    assert len(response.json()["rules"]) > 0
+
+def test_threat_heatmap_endpoint():
+    response = client.get("/analytics/threat-heatmap")
+    assert response.status_code == 200
+    data = response.json()
+    assert "geo_distribution" in data
+    assert "hourly_trends" in data
+    assert "vector_breakdown" in data

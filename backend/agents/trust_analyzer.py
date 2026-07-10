@@ -50,7 +50,7 @@ Content:
 
 {content}
 """
-    result = call_llm(prompt, model="deepseek", format_json=True)
+    result = call_llm(prompt, model="groq", format_json=True)
     if isinstance(result, str):
         try:
             result = json.loads(result)

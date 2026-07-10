@@ -18,7 +18,9 @@ def search_web(query):
     }
     
     try:
-        response = requests.post(url, headers=headers, json=payload)
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        response = requests.post(url, headers=headers, json=payload, verify=False, timeout=5)
         response.raise_for_status()
         data = response.json()
         
