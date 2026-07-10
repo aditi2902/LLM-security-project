@@ -5,7 +5,7 @@ import {
   Target, Activity, Zap, History, BarChart2, Lightbulb,
   ChevronDown, ChevronUp, Clock, Filter, TrendingUp, Shield,
   AlertOctagon, CheckCircle2, Copy, Check, ExternalLink, Cpu,
-  Globe
+  Globe, Paperclip
 } from 'lucide-react';
 import './index.css';
 
@@ -1250,6 +1250,36 @@ function App() {
   const [activeTab,    setActiveTab]    = useState('answer');
   const [currentRoute, setCurrentRoute] = useState('dashboard');
 
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setLoading(true); setError(null); setResult(null); setActiveTab('answer');
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const r = await fetch('http://localhost:8002/scan-document', {
+        method: 'POST',
+        body: formData,
+      });
+      if (!r.ok) throw new Error('Document processing failed: ' + r.status);
+      const data = await r.json();
+      setResult(data);
+      if (data.raw_content) {
+        // Provide visual indicator that a file was uploaded by showing a snippet
+        setQuery(`[File Uploaded: ${file.name}]`);
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to scan document.');
+    } finally {
+      setLoading(false);
+      e.target.value = '';
+    }
+  };
+
   const [reportData,  setReportData]  = useState([]);
   const [currentWave, setCurrentWave] = useState(null);
   const [loadingRT,   setLoadingRT]   = useState(false);
@@ -1349,6 +1379,13 @@ function App() {
                     value={query} onChange={e => setQuery(e.target.value)}
                     disabled={loading} autoComplete="off" />
                 </div>
+                <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".txt,.html,.htm,.json" style={{ display: 'none' }} />
+                <button type="button" className="btn-secondary" onClick={() => fileInputRef.current.click()} disabled={loading} style={{
+                  padding: '0.45rem 1rem', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em',
+                  display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px'
+                }}>
+                  <Paperclip size={18} /> Upload Doc
+                </button>
                 <button type="submit" className="btn-primary" disabled={loading || !query.trim()}>
                   {loading ? <Activity size={18} className="spin" /> : <Search size={18} />}
                   {loading ? 'Tracing...' : 'Trace'}

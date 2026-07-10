@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, UploadFile, File
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from typing import Optional
@@ -227,6 +227,42 @@ class QueryRequest(BaseModel):
 @app.post("/query")
 async def query_endpoint(req: QueryRequest):
     return _run_trust_pipeline(req.query, source="ui", model="gemini")
+
+
+@app.post("/scan-document")
+async def scan_document_endpoint(file: UploadFile = File(...)):
+    """
+    Parses and scans uploaded files (HTML, JSON, TXT) for prompt injections,
+    memory poisoning, and data leak vulnerabilities using the TrustLens pipeline.
+    """
+    from bs4 import BeautifulSoup
+    import json
+    
+    contents = await file.read()
+    filename = file.filename or "document.txt"
+    text_content = ""
+    
+    # 1. Parse content based on suffix
+    if filename.lower().endswith(".json"):
+        try:
+            parsed = json.loads(contents.decode("utf-8", errors="ignore"))
+            text_content = json.dumps(parsed, indent=2)
+        except Exception:
+            text_content = contents.decode("utf-8", errors="ignore")
+    elif filename.lower().endswith((".html", ".htm")):
+        try:
+            soup = BeautifulSoup(contents.decode("utf-8", errors="ignore"), "html.parser")
+            text_content = soup.get_text()
+        except Exception:
+            text_content = contents.decode("utf-8", errors="ignore")
+    else:
+        text_content = contents.decode("utf-8", errors="ignore")
+        
+    # 2. Run it through the Trust pipeline!
+    res = _run_trust_pipeline(text_content, source="doc_upload", model="gemini")
+    res["filename"] = filename
+    res["raw_content"] = text_content
+    return res
 
 
 # ──────────────────────────────────────────────────────────────────────────────
