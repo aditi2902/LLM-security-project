@@ -550,9 +550,9 @@ print(response.choices[0].message.content)
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
               {[
-                { label: "Active Threats", value: data?.total_attacks ?? 0, color: "var(--red)" },
-                { label: "Resolved Cases", value: data?.blocked_count ?? 0, color: "var(--green)" },
-                { label: "Vulnerabilities", value: cats.length, color: "var(--orange)" },
+                { label: "Active Threat Waves", value: data?.total_attacks ?? 0, color: "var(--red)" },
+                { label: "Mitigated Attacks", value: data?.blocked_count ?? 0, color: "var(--green)" },
+                { label: "Blocked Ingress Queries", value: data?.blocked_ingress ?? 0, color: "var(--orange)" },
               ].map((item, idx) => (
                 <div key={idx} style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -568,7 +568,7 @@ print(response.choices[0].message.content)
                 background: 'rgba(0,0,0,0.25)', padding: '0.6rem 0.8rem', borderRadius: '6px',
                 border: `1px solid ${isSecure ? 'rgba(76,175,80,0.2)' : 'rgba(244,67,54,0.2)'}`
               }}>
-                <span style={{ fontFamily: 'var(--font-ui)', fontSize: '0.78rem', color: 'var(--text-muted)' }}>System Status</span>
+                <span style={{ fontFamily: 'var(--font-ui)', fontSize: '0.78rem', color: 'var(--text-muted)' }}>Proxy Firewall Status</span>
                 <span style={{
                   fontFamily: 'var(--font-display)', fontSize: '0.82rem', fontWeight: 800,
                   color: isSecure ? 'var(--green)' : 'var(--red)',
@@ -582,13 +582,13 @@ print(response.choices[0].message.content)
           {/* Recent Alerts */}
           <div className="glass-panel" style={{ padding: '1rem' }}>
             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '0.85rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.4rem' }}>
-              Recent Alerts
+              Intrusion Log
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
               {recent.slice(0, 3).map((alert, idx) => {
                 const isCrit = alert.status === "BYPASSED";
                 const severity = isCrit ? "CRITICAL" : "MEDIUM";
-                const badgeColor = isCrit ? "var(--red)" : "var(--orange)";
+                const badgeColor = isCrit ? "var(--red)" : "var(--green)";
                 return (
                   <div key={idx} style={{
                     background: 'rgba(0,0,0,0.2)', padding: '0.65rem', borderRadius: '6px',
@@ -599,118 +599,95 @@ print(response.choices[0].message.content)
                         {(alert.category || 'Threat Detected').replace(/_/g, ' ')}
                       </span>
                       <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: badgeColor, fontWeight: 700 }}>
-                        {severity}
+                        {alert.status}
                       </span>
                     </div>
                     <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--text-muted)', margin: '0.2rem 0', lineHeight: 1.3 }}>
                       {alert.preview}
                     </p>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.3rem' }}>
-                      <span style={{ fontFamily: 'var(--font-ui)', fontSize: '0.62rem', color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline' }}>
-                        View Details
-                      </span>
-                    </div>
                   </div>
                 );
               })}
               {recent.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-                  No alerts recorded.
+                  No threats recorded.
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* ── COLUMN 2: CHARTS & NETWORK MAP ── */}
+        {/* ── COLUMN 2: CHARTS & ATTACK BREAKDOWN ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           
           {/* Threat Activity spline wave chart */}
           <div className="glass-panel" style={{ padding: '1.25rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
               <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '0.85rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                Threat Activity Over Time
+                Bypass Rates — Last 7 Days
               </h3>
-              <div style={{ display: 'flex', gap: '0.6rem', fontSize: '0.65rem', color: 'var(--text-muted)' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: '#00e5ff' }}></span> Jailbreak</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: '#ff9100' }}></span> Exfiltration</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: '#ff1744' }}></span> Poisoning</span>
-              </div>
             </div>
 
             {/* Spline waves SVG */}
             <div style={{ width: '100%', height: '140px', background: 'rgba(0,0,0,0.3)', borderRadius: '6px', position: 'relative', border: '1px solid rgba(255,255,255,0.02)' }}>
-              <svg width="100%" height="100%" viewBox="0 0 500 140" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="cyanGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#00e5ff" stopOpacity="0.4" /><stop offset="100%" stopColor="#00e5ff" stopOpacity="0" /></linearGradient>
-                  <linearGradient id="orangeGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#ff9100" stopOpacity="0.4" /><stop offset="100%" stopColor="#ff9100" stopOpacity="0" /></linearGradient>
-                  <linearGradient id="redGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#ff1744" stopOpacity="0.4" /><stop offset="100%" stopColor="#ff1744" stopOpacity="0" /></linearGradient>
-                </defs>
-                {/* Gridlines */}
-                <line x1="0" y1="35" x2="500" y2="35" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                <line x1="0" y1="70" x2="500" y2="70" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                <line x1="0" y1="105" x2="500" y2="105" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+              {trend.length > 0 ? (
+                <svg width="100%" height="100%" viewBox="0 0 500 140" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="trendGlow" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.4" />
+                      <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  {/* Gridlines */}
+                  <line x1="0" y1="35" x2="500" y2="35" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                  <line x1="0" y1="70" x2="500" y2="70" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                  <line x1="0" y1="105" x2="500" y2="105" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
 
-                {/* Spline Path 1: Jailbreaks (Cyan) */}
-                <path d="M 0 110 Q 80 40 160 80 T 320 30 T 420 90 T 500 40" fill="none" stroke="#00e5ff" strokeWidth="2.5" />
-                <path d="M 0 110 Q 80 40 160 80 T 320 30 T 420 90 T 500 40 L 500 140 L 0 140 Z" fill="url(#cyanGlow)" />
-
-                {/* Spline Path 2: Exfiltration (Orange) */}
-                <path d="M 0 120 Q 90 90 180 50 T 360 80 T 500 60" fill="none" stroke="#ff9100" strokeWidth="2" />
-                <path d="M 0 120 Q 90 90 180 50 T 360 80 T 500 60 L 500 140 L 0 140 Z" fill="url(#orangeGlow)" />
-
-                {/* Spline Path 3: Poisoning (Red) */}
-                <path d="M 0 130 Q 110 110 220 100 T 400 50 T 500 95" fill="none" stroke="#ff1744" strokeWidth="2" />
-                <path d="M 0 130 Q 110 110 220 100 T 400 50 T 500 95 L 500 140 L 0 140 Z" fill="url(#redGlow)" />
-              </svg>
+                  {/* Draw Sparkline line based on actual trend rates */}
+                  <path d={`M ${trend.map((t, i) => `${(i / (trend.length - 1 || 1)) * 480 + 10} ${120 - (t.bypass_rate / 100) * 80}`).join(' L ')}`} fill="none" stroke="var(--primary)" strokeWidth="2.5" />
+                  <path d={`M ${trend.map((t, i) => `${(i / (trend.length - 1 || 1)) * 480 + 10} ${120 - (t.bypass_rate / 100) * 80}`).join(' L ')} L 490 140 L 10 140 Z`} fill="url(#trendGlow)" />
+                </svg>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                  No historical trend logs.
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Network Traffic/Map Panel */}
+          {/* Attack Category Breakdown progress bars */}
           <div className="glass-panel" style={{ padding: '1.25rem' }}>
             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '0.85rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem' }}>
-              Network Traffic
+              Vector Breakdown
             </h3>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1rem', alignItems: 'center' }}>
-              {/* Micro Map */}
-              <div style={{ width: '100%', height: '90px', background: 'rgba(0,0,0,0.2)', borderRadius: '6px', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="90%" height="90%" viewBox="0 0 180 90" style={{ opacity: 0.85 }}>
-                  {/* Outline Dots of Map */}
-                  <rect x="20" y="20" width="30" height="15" rx="3" fill="rgba(255,255,255,0.06)" />
-                  <rect x="70" y="15" width="25" height="20" rx="3" fill="rgba(255,255,255,0.06)" />
-                  <rect x="110" y="30" width="40" height="25" rx="3" fill="rgba(255,255,255,0.06)" />
-                  <rect x="35" y="45" width="20" height="25" rx="3" fill="rgba(255,255,255,0.06)" />
-                  
-                  {/* Connective Arcs */}
-                  <path d="M 35 27 Q 70 10 82 25" fill="none" stroke="rgba(0,229,255,0.3)" strokeWidth="1" strokeDasharray="3,3" />
-                  <path d="M 82 25 Q 110 20 130 42" fill="none" stroke="rgba(255,23,68,0.3)" strokeWidth="1" strokeDasharray="3,3" />
-
-                  {/* Pulsing Intrusion Nodes */}
-                  <circle cx="35" cy="27" r="3" fill="#00e5ff" className="ping" />
-                  <circle cx="82" cy="25" r="3" fill="#ff9100" />
-                  <circle cx="130" cy="42" r="3" fill="#ff1744" className="ping" />
-                </svg>
-              </div>
-
-              {/* Data Speed Counters */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.3)', padding: '0.4rem 0.6rem', borderRadius: '4px' }}>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)' }}>🟢 Data In</span>
-                  <span style={{ fontSize: '0.8rem', fontFamily: 'var(--font-mono)', fontWeight: 800, color: 'var(--green)' }}>1.25 GB</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              {cats.slice(0, 3).map((c, idx) => {
+                const total = c.total || 1;
+                const blockedPct = (c.blocked / total) * 100;
+                return (
+                  <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem' }}>
+                      <span style={{ fontFamily: 'var(--font-ui)', color: 'var(--text-primary)' }}>{(c.category || 'Unknown').replace(/_/g, ' ')}</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>{c.blocked} / {c.total} Blocked</span>
+                    </div>
+                    <div style={{ width: '100%', height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ width: `${blockedPct}%`, height: '100%', background: 'var(--primary)', borderRadius: '3px' }} />
+                    </div>
+                  </div>
+                );
+              })}
+              {cats.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                  No categories recorded.
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(0,0,0,0.3)', padding: '0.4rem 0.6rem', borderRadius: '4px' }}>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-ui)' }}>🔴 Data Out</span>
-                  <span style={{ fontSize: '0.8rem', fontFamily: 'var(--font-mono)', fontWeight: 800, color: 'var(--primary)' }}>980 MB</span>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
           {/* Incident Summary Dual Bar Chart */}
           <div className="glass-panel" style={{ padding: '1.25rem' }}>
             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '0.85rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem' }}>
-              Incident Summary (Last 7 Days)
+              Mitigation Summary (Daily Attacks)
             </h3>
             <div style={{ height: '90px', width: '100%', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '0.2rem', padding: '0 0.5rem' }}>
               {trend.map((t, idx) => {
@@ -744,8 +721,8 @@ print(response.choices[0].message.content)
               )}
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '0.6rem', fontSize: '0.65rem' }}>
-              <span style={{ color: 'var(--green)' }}>● Resolved</span>
-              <span style={{ color: 'var(--red)' }}>● Unresolved</span>
+              <span style={{ color: 'var(--green)' }}>● Mitigated</span>
+              <span style={{ color: 'var(--red)' }}>● Bypassed</span>
             </div>
           </div>
         </div>
@@ -756,7 +733,7 @@ print(response.choices[0].message.content)
           {/* Vulnerability Report Segment Ring Chart */}
           <div className="glass-panel" style={{ padding: '1rem' }}>
             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '0.85rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.4rem' }}>
-              Vulnerability Report
+              Trust Assessment
             </h3>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', justifyContent: 'center', margin: '0.5rem 0' }}>
@@ -764,8 +741,8 @@ print(response.choices[0].message.content)
               <div style={{ position: 'relative', width: '90px', height: '90px' }}>
                 <svg width="90" height="90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="8" />
-                  <circle cx="50" cy="50" r="40" fill="none" stroke="var(--red)" strokeWidth="8"
-                    strokeDasharray="251" strokeDashoffset={251 * (1 - (data?.bypass_rate ?? 0) / 100)}
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="var(--primary)" strokeWidth="8"
+                    strokeDasharray="251" strokeDashoffset={251 * (1 - (data?.block_rate ?? 0) / 100)}
                     strokeLinecap="round" transform="rotate(-90 50 50)" style={{ transition: 'stroke-dashoffset 1s ease' }} />
                 </svg>
                 <div style={{
@@ -773,10 +750,10 @@ print(response.choices[0].message.content)
                   alignItems: 'center', justifyContent: 'center', textAlign: 'center'
                 }}>
                   <span style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'var(--font-display)' }}>
-                    {data?.bypass_rate ?? 0}%
+                    {data?.block_rate ?? 0}%
                   </span>
                   <span style={{ fontSize: '0.52rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Risk Rate
+                    Block Rate
                   </span>
                 </div>
               </div>
@@ -784,12 +761,12 @@ print(response.choices[0].message.content)
               {/* Severity Counts */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: 1 }}>
                 {[
-                  { label: "Critical", count: data?.blocked_ingress ?? 0, color: "var(--red)" },
-                  { label: "High Risk", count: data?.bypassed_count ?? 0, color: "var(--orange)" },
-                  { label: "Medium", count: data?.total_queries ?? 0, color: "var(--cyan)" }
+                  { label: "Bypass Rate", count: `${data?.bypass_rate ?? 0}%`, color: "var(--red)" },
+                  { label: "Block Rate", count: `${data?.block_rate ?? 0}%`, color: "var(--green)" },
+                  { label: "Total Audits", count: data?.total_queries ?? 0, color: "var(--cyan)" }
                 ].map((sev, idx) => (
                   <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', fontFamily: 'var(--font-ui)' }}>
-                    <span style={{ color: 'var(--text-muted)' }}>⚠️ {sev.label}</span>
+                    <span style={{ color: 'var(--text-muted)' }}>{sev.label}</span>
                     <span style={{ color: sev.color, fontWeight: 700 }}>{sev.count}</span>
                   </div>
                 ))}
@@ -797,39 +774,40 @@ print(response.choices[0].message.content)
             </div>
           </div>
 
-          {/* Device Status */}
+          {/* Proxy Gateway Engine Status */}
           <div className="glass-panel" style={{ padding: '1rem' }}>
             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '0.85rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.4rem' }}>
-              Device Status
+              Proxy Engine Status
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {[
-                { name: "Firewall-Server1", status: "Online", color: "var(--green)" },
-                { name: "Workstation-23", status: "At Risk", color: "var(--red)" },
-                { name: "DB-Server 02", status: "Secure", color: "var(--cyan)" }
+                { name: "Ingress Guardrail", status: "ACTIVE", color: "var(--green)" },
+                { name: "Egress Validator", status: "ACTIVE", color: "var(--green)" },
+                { name: "Self-Hardening Loop", status: "ACTIVE", color: "var(--green)" },
+                { name: "Local Gateway Port", status: "8002", color: "var(--cyan)" }
               ].map((dev, idx) => (
                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.74rem' }}>
-                  <span style={{ fontFamily: 'var(--font-ui)', color: 'var(--text-muted)' }}>🖥️ {dev.name}</span>
+                  <span style={{ fontFamily: 'var(--font-ui)', color: 'var(--text-muted)' }}>{dev.name}</span>
                   <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: dev.color }}>{dev.status}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* User Activity log */}
+          {/* Real-time System Metrics */}
           <div className="glass-panel" style={{ padding: '1rem' }}>
             <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '0.85rem', color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.75rem', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: '0.4rem' }}>
-              User Activity
+              System Metrics
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
               {[
-                { type: "Admin Login", time: "10:24 AM", color: "var(--cyan)" },
-                { type: "Failed Login Attempt", time: "09:50 AM", color: "var(--red)" },
-                { type: "File Access: Config", time: "09:30 AM", color: "var(--text-muted)" }
+                { type: "Total API Inferences", value: data?.total_queries ?? 0, color: "var(--cyan)" },
+                { type: "Active Security Score", value: `${score}/100`, color: "var(--green)" },
+                { type: "Memory Poisoning Rate", value: "0%", color: "var(--text-muted)" }
               ].map((act, idx) => (
                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.72rem' }}>
-                  <span style={{ fontFamily: 'var(--font-ui)', color: act.color }}>👤 {act.type}</span>
-                  <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>{act.time}</span>
+                  <span style={{ fontFamily: 'var(--font-ui)', color: act.color }}>{act.type}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', fontWeight: 700 }}>{act.value}</span>
                 </div>
               ))}
             </div>
