@@ -40,6 +40,15 @@
   --border-danger: rgba(244, 67, 54, 0.4);
   --border-success: rgba(0, 230, 118, 0.4);
 
+  /* Kevlar, Chrome, Flare Palette */
+  --kevlar-base: #0b0c10;
+  --kevlar-surface: #1f2833;
+  --chrome-light: #c5c6c7;
+  --chrome-bright: #ffffff;
+  --flare-accent: #ff4500;
+  --flare-glow: rgba(255, 69, 0, 0.4);
+  --flare-dim: rgba(255, 69, 0, 0.15);
+
   /* Typography */
   --font-display: 'Orbitron', sans-serif;
   --font-ui:      'Rajdhani', sans-serif;
@@ -666,6 +675,7 @@ body {
   flex-wrap: wrap;
 }
 
+/* ===================== WAVES ===================== */
 .wave-stat {
   display: flex;
   flex-direction: column;
@@ -673,6 +683,204 @@ body {
   padding: 0 2rem;
   flex: 1;
   min-width: 80px;
+}
+
+/* ===================== LANDING PAGE (KEVLAR, CHROME, FLARE) ===================== */
+.landing-page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, var(--kevlar-surface) 0%, var(--kevlar-base) 80%);
+  z-index: 100;
+  overflow: hidden;
+}
+
+/* Translucent architectural structure behind the main content */
+.landing-architecture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: 
+    linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px);
+  background-size: 50px 50px;
+  transform: perspective(1000px) rotateX(60deg) scale(2);
+  transform-origin: bottom center;
+  opacity: 0.3;
+  animation: architecture-pan 30s linear infinite;
+}
+
+@keyframes architecture-pan {
+  0% { transform: perspective(1000px) rotateX(60deg) translateY(0) scale(2); }
+  100% { transform: perspective(1000px) rotateX(60deg) translateY(50px) scale(2); }
+}
+
+/* Abstract data pulses moving upwards */
+.data-pulses {
+  position: absolute;
+  bottom: -20vh;
+  left: 50%;
+  width: 2px;
+  height: 120vh;
+  background: linear-gradient(to top, transparent, var(--flare-accent), transparent);
+  opacity: 0;
+  transform: translateX(-50%);
+  animation: data-pulse-anim 4s ease-in-out infinite;
+  box-shadow: 0 0 20px var(--flare-glow);
+}
+
+.data-pulses:nth-child(2) {
+  left: 20%;
+  animation-delay: 1.5s;
+  animation-duration: 5s;
+  height: 80vh;
+}
+
+.data-pulses:nth-child(3) {
+  left: 80%;
+  animation-delay: 0.8s;
+  animation-duration: 4.2s;
+  height: 100vh;
+}
+
+@keyframes data-pulse-anim {
+  0% { transform: translateX(-50%) translateY(0); opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { transform: translateX(-50%) translateY(-100vh); opacity: 0; }
+}
+
+.landing-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  max-width: 800px;
+  padding: 3rem;
+}
+
+.landing-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 900;
+  color: var(--chrome-bright);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: 0 0 30px rgba(255,255,255,0.2);
+  line-height: 1.1;
+  margin-bottom: 0.5rem;
+}
+
+.landing-subtitle {
+  font-family: var(--font-ui);
+  font-size: 1.25rem;
+  color: var(--chrome-light);
+  letter-spacing: 0.05em;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+.cta-button {
+  background: rgba(255, 69, 0, 0.1);
+  border: 1px solid var(--flare-accent);
+  color: var(--flare-accent);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 1rem 3rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 20px var(--flare-dim), inset 0 0 10px var(--flare-dim);
+  backdrop-filter: blur(10px);
+}
+
+.cta-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 69, 0, 0.4), transparent);
+  transform: skewX(-25deg);
+  transition: all 0.5s;
+}
+
+.cta-button:hover {
+  background: var(--flare-accent);
+  color: var(--kevlar-base);
+  box-shadow: 0 0 40px var(--flare-glow);
+  transform: translateY(-2px);
+}
+
+.cta-button:hover::before {
+  left: 200%;
+  transition: all 0.7s;
+}
+
+/* Glassmorphism architectural overlay panels */
+.architectural-panel {
+  position: absolute;
+  border: 1px solid rgba(255,255,255,0.05);
+  background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 100%);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  pointer-events: none;
+}
+
+.panel-left {
+  top: 10%;
+  left: -5%;
+  width: 30vw;
+  height: 60vh;
+  transform: skewY(-15deg);
+  border-right: 1px solid var(--chrome-light);
+  box-shadow: 20px 0 50px rgba(0,0,0,0.5);
+  animation: panel-float 6s ease-in-out infinite alternate;
+}
+
+.panel-right {
+  bottom: -10%;
+  right: -5%;
+  width: 40vw;
+  height: 70vh;
+  transform: skewY(-15deg);
+  border-left: 1px solid var(--flare-accent);
+  box-shadow: -20px 0 50px rgba(0,0,0,0.5), inset 2px 0 20px var(--flare-dim);
+  animation: panel-float 8s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes panel-float {
+  0% { transform: skewY(-15deg) translateY(0); }
+  100% { transform: skewY(-15deg) translateY(-20px); }
+}
+
+.brand-partner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  font-family: var(--font-ui);
+  color: var(--chrome-light);
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+
+.brand-divider {
+  width: 1px;
+  height: 1rem;
+  background: var(--chrome-light);
+  opacity: 0.5;
 }
 
 .wave-stat-num {

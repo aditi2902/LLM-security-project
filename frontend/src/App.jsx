@@ -523,12 +523,7 @@ print(response.choices[0].message.content)
           <h1 className="page-title glitch" data-text="CYBERSECURE CONTROL">CYBERSECURE CONTROL</h1>
           <p className="page-subtitle" style={{ fontSize: '0.8rem' }}>AI Agent Observability, Threat Analytics & Egress Validation Console</p>
         </div>
-        <button onClick={load} className="btn-primary" style={{
-          padding: '0.45rem 1rem', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.05em',
-          display: 'flex', alignItems: 'center', gap: '0.5rem'
-        }}>
-          <Activity size={13} className="spin-hover" /> Scan Now
-        </button>
+
       </header>
 
       {/* Cybersecure Dashboard Grid Layout */}
@@ -1014,6 +1009,7 @@ const ThreatMapPage = () => {
   return (
     <div className="animate-in">
       <header className="page-header">
+        <div style={{fontFamily:'var(--font-mono)',fontSize:'0.7rem',color:'var(--red)',opacity:0.7,letterSpacing:'0.25em',marginBottom:'0.5rem'}}>◄ THREAT_FEED_LIVE ► // GEO_ACTIVE</div>
         <h1 className="page-title glitch" data-text="THREAT COMMAND CENTER">THREAT COMMAND CENTER</h1>
         <p className="page-subtitle">
           Real-time threat geolocations, peak attack hours, and adaptive self-hardening defense loops.
@@ -1023,16 +1019,22 @@ const ThreatMapPage = () => {
       {/* Stats Counter */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
         {[
-          { label: 'Total Threats Mapped', value: geoData.reduce((acc, curr) => acc + curr.count, 0), color: 'var(--red)' },
-          { label: 'Pending Security Rules', value: pendingRules.length, color: 'var(--orange)' },
-          { label: 'Active Rules Enforced', value: activeRules.length, color: 'var(--green)' },
-          { label: 'Global Subnets Scanned', value: Math.max(12, geoData.length * 3), color: 'var(--primary)' }
+          { label: 'Total Threats Mapped', value: geoData.reduce((acc, curr) => acc + curr.count, 0), color: 'var(--red)', sym: '◉' },
+          { label: 'Pending Security Rules', value: pendingRules.length, color: 'var(--orange)', sym: '⊞' },
+          { label: 'Active Rules Enforced', value: activeRules.length, color: 'var(--green)', sym: '◈' },
+          { label: 'Global Subnets Scanned', value: Math.max(12, geoData.length * 3), color: 'var(--primary)', sym: '⊕' }
         ].map(s => (
-          <div key={s.label} className="glass-panel" style={{ padding: '1rem 1.25rem' }}>
-            <span style={{ fontSize: '0.78rem', fontFamily: 'var(--font-ui)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              {s.label}
-            </span>
-            <div style={{ fontSize: '1.8rem', fontFamily: 'var(--font-display)', fontWeight: 800, color: s.color, marginTop: '0.2rem' }}>
+          <div key={s.label} className="glass-panel" style={{ padding: '1rem 1.25rem', position: 'relative', overflow: 'hidden' }}>
+            {/* Corner tick marks */}
+            <span style={{ position:'absolute', top:'4px', left:'4px', fontFamily:'var(--font-mono)', fontSize:'0.55rem', color:'var(--border-active)', lineHeight:1, pointerEvents:'none' }}>⌐</span>
+            <span style={{ position:'absolute', top:'4px', right:'4px', fontFamily:'var(--font-mono)', fontSize:'0.55rem', color:'var(--border-active)', lineHeight:1, pointerEvents:'none' }}>¬</span>
+            <div style={{ display:'flex', alignItems:'center', gap:'0.4rem', marginBottom:'0.15rem' }}>
+              <span style={{ fontFamily:'var(--font-mono)', fontSize:'0.85rem', color: s.color, opacity: 0.8 }}>{s.sym}</span>
+              <span style={{ fontSize: '0.72rem', fontFamily: 'var(--font-ui)', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {s.label}
+              </span>
+            </div>
+            <div style={{ fontSize: '1.8rem', fontFamily: 'var(--font-display)', fontWeight: 800, color: s.color }}>
               {s.value}
             </div>
           </div>
@@ -1048,10 +1050,13 @@ const ThreatMapPage = () => {
           <div className="glass-panel" style={{ padding: '1.5rem', position: 'relative' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <div className="data-block-label" style={{ color: 'var(--primary)', textTransform: 'uppercase' }}>
-                <Globe size={14} style={{ display: 'inline', marginRight: '0.4rem', verticalAlign: 'middle' }} />
+                <span style={{ fontFamily:'var(--font-mono)', marginRight:'0.4rem', fontSize:'0.9rem' }}>◉</span>
                 Real-Time Attack Origin Geolocation
               </div>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>COMMAND CONSOLE ACTIVE</span>
+              <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
+                <span style={{ width:6, height:6, borderRadius:'50%', background:'var(--cyan)', boxShadow:'0 0 6px var(--cyan)', display:'inline-block', animation:'glbPulse 1.5s ease-in-out infinite' }} />
+                <span style={{ fontSize: '0.65rem', color: 'var(--cyan)', fontFamily: 'var(--font-mono)', letterSpacing:'0.12em' }}>◄ COMMAND CONSOLE ACTIVE ►</span>
+              </div>
             </div>
             
             <div style={{ background: 'radial-gradient(ellipse at 50% 40%, rgba(0,229,255,0.05) 0%, rgba(2,8,22,0.95) 70%)', border: '1px solid rgba(0,229,255,0.3)', borderRadius: '8px', overflow: 'hidden', height: '420px', position: 'relative', boxShadow: 'inset 0 0 80px rgba(0,229,255,0.03), 0 0 24px rgba(0,229,255,0.08)' }}>
@@ -1075,9 +1080,12 @@ const ThreatMapPage = () => {
 
           {/* Peak Hours Chart */}
           <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <div className="data-block-label" style={{ color: 'var(--primary)', marginBottom: '1.25rem' }}>
-              <Clock size={14} style={{ display: 'inline', marginRight: '0.4rem', verticalAlign: 'middle' }} />
-              Attack Volume by Hour (Peak Resource Allocation)
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: '1.25rem' }}>
+              <div className="data-block-label" style={{ color: 'var(--primary)', marginBottom: 0 }}>
+                <span style={{ fontFamily:'var(--font-mono)', marginRight:'0.4rem', fontSize:'0.9rem' }}>⊞</span>
+                Attack Volume by Hour (Peak Resource Allocation)
+              </div>
+              <span style={{ fontFamily:'var(--font-mono)', fontSize:'0.6rem', color:'var(--text-muted)', letterSpacing:'0.12em' }}>0 ────────────────── 23h</span>
             </div>
             <div style={{ display: 'flex', gap: '4px', height: '80px', alignItems: 'flex-end', paddingBottom: '0.2rem', borderBottom: '1px solid rgba(0,229,255,0.1)' }}>
               {hourlyTrends.map((t, idx) => {
@@ -1099,9 +1107,12 @@ const ThreatMapPage = () => {
           
           {/* Simulation Sandbox */}
           <div className="glass-panel animate-border" style={{ padding: '1.5rem', borderColor: 'rgba(0,229,255,0.25)' }}>
-            <div className="data-block-label" style={{ color: 'var(--cyan)', textTransform: 'uppercase', marginBottom: '1rem' }}>
-              <ShieldAlert size={14} style={{ display: 'inline', marginRight: '0.4rem', verticalAlign: 'middle' }} />
-              Red Team Attack Sandbox
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1rem' }}>
+              <div className="data-block-label" style={{ color: 'var(--cyan)', textTransform: 'uppercase', marginBottom: 0 }}>
+                <span style={{ fontFamily:'var(--font-mono)', marginRight:'0.4rem', fontSize:'0.9rem' }}>◈</span>
+                Red Team Attack Sandbox
+              </div>
+              <span style={{ fontFamily:'var(--font-mono)', fontSize:'0.58rem', color:'rgba(0,229,255,0.4)', letterSpacing:'0.18em', border:'1px solid rgba(0,229,255,0.15)', padding:'0.15rem 0.4rem', borderRadius:'3px' }}>START_</span>
             </div>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
               Trigger preset attack payloads directly into the proxy to test self-hardening logic.
@@ -1114,7 +1125,10 @@ const ThreatMapPage = () => {
                         onClick={() => runSimulation(p.text, p.category)}
                         className="obs-tab" 
                         style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0.65rem 0.9rem', background: 'rgba(0,229,255,0.03)', border: '1px solid rgba(0,229,255,0.1)', cursor: 'pointer', textAlign: 'left' }}>
-                  <span style={{ fontSize: '0.82rem', fontFamily: 'var(--font-ui)', fontWeight: 600, color: 'var(--text-primary)' }}>{p.label}</span>
+                  <div style={{ display:'flex', alignItems:'center', gap:'0.5rem' }}>
+                    <span style={{ fontFamily:'var(--font-mono)', fontSize:'0.7rem', color:'var(--cyan)', opacity:0.6 }}>⟨{String(idx+1).padStart(2,'0')}⟩</span>
+                    <span style={{ fontSize: '0.82rem', fontFamily: 'var(--font-ui)', fontWeight: 600, color: 'var(--text-primary)' }}>{p.label}</span>
+                  </div>
                   <Zap size={12} color="var(--cyan)" />
                 </button>
               ))}
@@ -1129,9 +1143,12 @@ const ThreatMapPage = () => {
 
           {/* Self-Hardening proposed rules (Pending) */}
           <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <div className="data-block-label" style={{ color: 'var(--orange)', textTransform: 'uppercase', marginBottom: '1rem' }}>
-              <Lightbulb size={14} style={{ display: 'inline', marginRight: '0.4rem', verticalAlign: 'middle' }} />
-              Pending Hardening Rules (Awaiting Approval)
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1rem' }}>
+              <div className="data-block-label" style={{ color: 'var(--orange)', textTransform: 'uppercase', marginBottom: 0 }}>
+                <span style={{ fontFamily:'var(--font-mono)', marginRight:'0.4rem', fontSize:'0.9rem' }}>⊕</span>
+                Pending Hardening Rules (Awaiting Approval)
+              </div>
+              {pendingRules.length > 0 && <span style={{ fontFamily:'var(--font-mono)', fontSize:'0.62rem', color:'var(--orange)', background:'rgba(255,152,0,0.1)', border:'1px solid rgba(255,152,0,0.25)', padding:'0.15rem 0.45rem', borderRadius:'3px', letterSpacing:'0.08em' }}>{pendingRules.length} QUEUED</span>}
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -1165,9 +1182,12 @@ const ThreatMapPage = () => {
 
           {/* Active Rules List */}
           <div className="glass-panel" style={{ padding: '1.5rem' }}>
-            <div className="data-block-label" style={{ color: 'var(--green)', textTransform: 'uppercase', marginBottom: '1rem' }}>
-              <ShieldCheck size={14} style={{ display: 'inline', marginRight: '0.4rem', verticalAlign: 'middle' }} />
-              Active System Safety Rules ({activeRules.length})
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1rem' }}>
+              <div className="data-block-label" style={{ color: 'var(--green)', textTransform: 'uppercase', marginBottom: 0 }}>
+                <span style={{ fontFamily:'var(--font-mono)', marginRight:'0.4rem', fontSize:'0.9rem' }}>◈</span>
+                Active System Safety Rules
+              </div>
+              <span style={{ fontFamily:'var(--font-mono)', fontSize:'0.62rem', color:'var(--green)', background:'rgba(0,230,118,0.08)', border:'1px solid rgba(0,230,118,0.2)', padding:'0.15rem 0.45rem', borderRadius:'3px', letterSpacing:'0.08em' }}>{activeRules.length} ENFORCED</span>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '180px', overflowY: 'auto' }}>
@@ -1201,13 +1221,219 @@ const ThreatMapPage = () => {
 };
 
 
+/* ============================================================
+   CYBER NETWORK CANVAS — animated threat graph for landing page
+   ============================================================ */
+const CyberNetworkCanvas = () => {
+  const canvasRef = useRef(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animId;
+
+    const resize = () => {
+      canvas.width  = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    // --- Nodes (servers / endpoints / agents) ---
+    const NODE_COUNT = 28;
+    const nodes = Array.from({ length: NODE_COUNT }, (_, i) => ({
+      x:     Math.random() * canvas.width,
+      y:     Math.random() * canvas.height,
+      vx:    (Math.random() - 0.5) * 0.35,
+      vy:    (Math.random() - 0.5) * 0.35,
+      r:     Math.random() * 4 + 3,
+      type:  ['hub', 'node', 'threat'][Math.floor(Math.random() * 3)],
+      pulse: Math.random() * Math.PI * 2,
+    }));
+    // Make a few hubs larger & fixed-ish
+    nodes.slice(0, 4).forEach(n => { n.r = 9; n.type = 'hub'; });
+
+    // --- Data packets travelling along edges ---
+    const packets = [];
+    const spawnPacket = () => {
+      const a = Math.floor(Math.random() * NODE_COUNT);
+      let b;
+      do { b = Math.floor(Math.random() * NODE_COUNT); } while (b === a);
+      packets.push({ from: a, to: b, t: 0, speed: Math.random() * 0.008 + 0.004, threat: Math.random() > 0.7 });
+    };
+    for (let i = 0; i < 12; i++) spawnPacket();
+
+    // --- Hex grid scan overlay ---
+    let scanY = 0;
+
+    const HEX_SIZE = 28;
+    const drawHexGrid = () => {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0,229,255,0.04)';
+      ctx.lineWidth = 0.5;
+      const cols = Math.ceil(canvas.width  / (HEX_SIZE * 1.75)) + 1;
+      const rows = Math.ceil(canvas.height / (HEX_SIZE * 1.5))  + 1;
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const cx = col * HEX_SIZE * 1.75 + (row % 2 === 0 ? 0 : HEX_SIZE * 0.875);
+          const cy = row * HEX_SIZE * 1.5;
+          ctx.beginPath();
+          for (let s = 0; s < 6; s++) {
+            const angle = (Math.PI / 180) * (60 * s - 30);
+            const px = cx + HEX_SIZE * Math.cos(angle);
+            const py = cy + HEX_SIZE * Math.sin(angle);
+            s === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Hex grid
+      drawHexGrid();
+
+      // Scan beam
+      scanY = (scanY + 0.6) % canvas.height;
+      const scanGrad = ctx.createLinearGradient(0, scanY - 60, 0, scanY + 60);
+      scanGrad.addColorStop(0,   'transparent');
+      scanGrad.addColorStop(0.5, 'rgba(255,69,0,0.06)');
+      scanGrad.addColorStop(1,   'transparent');
+      ctx.fillStyle = scanGrad;
+      ctx.fillRect(0, scanY - 60, canvas.width, 120);
+
+      // Edges
+      nodes.forEach((a, i) => {
+        nodes.forEach((b, j) => {
+          if (j <= i) return;
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > 180) return;
+          const alpha = (1 - dist / 180) * 0.35;
+          ctx.strokeStyle = a.type === 'threat' || b.type === 'threat'
+            ? `rgba(255,69,0,${alpha})`
+            : `rgba(0,229,255,${alpha})`;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        });
+      });
+
+      // Data packets
+      packets.forEach((pk, idx) => {
+        pk.t += pk.speed;
+        if (pk.t >= 1) { packets.splice(idx, 1); spawnPacket(); return; }
+        const a = nodes[pk.from], b = nodes[pk.to];
+        const px = a.x + (b.x - a.x) * pk.t;
+        const py = a.y + (b.y - a.y) * pk.t;
+        const color = pk.threat ? '#ff4500' : '#00e5ff';
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      // Nodes
+      nodes.forEach(n => {
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > canvas.width)  n.vx *= -1;
+        if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+        n.pulse += 0.04;
+
+        const color = n.type === 'threat' ? '#ff4500' : n.type === 'hub' ? '#ffffff' : '#00e5ff';
+        // Outer pulse ring
+        if (n.type === 'hub') {
+          const pR = n.r + 6 + Math.sin(n.pulse) * 4;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, pR, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(255,255,255,${0.1 + 0.05 * Math.sin(n.pulse)})`;
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+        // Node core
+        const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+        grad.addColorStop(0, color);
+        grad.addColorStop(1, 'transparent');
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = n.type === 'hub' ? 18 : 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+      animId = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', resize); };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+    />
+  );
+};
+
+/* ============================================================
+   LANDING PAGE (KEVLAR, CHROME, FLARE)
+   ============================================================ */
+const LandingPage = ({ onStart }) => {
+  return (
+    <div className="landing-page">
+      {/* Dynamic 3D / abstract background */}
+      <div className="landing-architecture"></div>
+
+      {/* Data Pulses */}
+      <div className="data-pulses"></div>
+      <div className="data-pulses"></div>
+      <div className="data-pulses"></div>
+
+      {/* Architectural Overlay Panels */}
+      <div className="architectural-panel panel-left"></div>
+      <div className="architectural-panel panel-right"></div>
+
+      {/* Cyber network threat graph canvas animation */}
+      <CyberNetworkCanvas />
+
+      <div className="landing-content">
+        <div>
+          <div style={{fontFamily:'var(--font-mono)',fontSize:'0.85rem',color:'var(--flare-accent)',letterSpacing:'0.25em',marginBottom:'1rem'}}>SYSTEM_READY // INITIATE_TRACE</div>
+          <h1 className="landing-title">TrustLens</h1>
+          <p className="landing-subtitle">
+            Visualize cybersecurity as a connected, intelligent, and proactive ecosystem.
+            Trace every inference, trust decision, and memory write in real-time with our
+            tactical, system-focused control plane.
+          </p>
+        </div>
+
+        <button className="cta-button" onClick={onStart}>
+          Start for Free
+        </button>
+      </div>
+    </div>
+  );
+};
+
 function App() {
   const [query,        setQuery]        = useState('');
   const [loading,      setLoading]      = useState(false);
   const [result,       setResult]       = useState(null);
   const [error,        setError]        = useState(null);
   const [activeTab,    setActiveTab]    = useState('answer');
-  const [currentRoute, setCurrentRoute] = useState('dashboard');
+  const [currentRoute, setCurrentRoute] = useState('landing');
 
   const fileInputRef = useRef(null);
 
@@ -1292,33 +1518,42 @@ function App() {
 
   return (
     <>
-      <MatrixCanvas />
+      {currentRoute !== 'landing' && <MatrixCanvas />}
       <div className={`ambient-layer ${currentRoute}`} />
-      <div className="scanlines" />
+      {currentRoute !== 'landing' && <div className="scanlines" />}
 
       <div className="app-wrapper">
-        <nav className="top-nav">
-          <div className="nav-logo" onClick={() => setCurrentRoute('dashboard')}>
-            <div className="nav-logo-icon"><Eye size={20} color="#fff" /></div>
-            <span className="nav-logo-text">Trust<span>Lens</span></span>
-          </div>
-          <div className="nav-links">
-            <button className={`nav-btn ${currentRoute === 'dashboard' ? 'active' : ''}`} onClick={() => setCurrentRoute('dashboard')}>
-              <Activity size={16} /> Trace Dashboard
-            </button>
-            <button className={`nav-btn ${currentRoute === 'threatmap' ? 'active' : ''}`} onClick={() => setCurrentRoute('threatmap')}>
-              <Globe size={16} /> Threat Map
-            </button>
-            <button className={`nav-btn ${currentRoute === 'redteam' ? 'active' : ''}`} onClick={() => setCurrentRoute('redteam')}>
-              <Target size={16} /> Red Team Simulator
-            </button>
-            <button className={`nav-btn ${currentRoute === 'analytics' ? 'active' : ''}`} onClick={() => setCurrentRoute('analytics')}>
-              <BarChart2 size={16} /> Analytics
-            </button>
-          </div>
-        </nav>
+        {currentRoute !== 'landing' && (
+          <nav className="top-nav">
+            <div className="nav-logo" onClick={() => setCurrentRoute('dashboard')}>
+              <div className="nav-logo-icon"><Eye size={20} color="#fff" /></div>
+              <span className="nav-logo-text">Trust<span>Lens</span></span>
+            </div>
+            <div className="nav-links">
+              <button className={`nav-btn ${currentRoute === 'dashboard' ? 'active' : ''}`} onClick={() => setCurrentRoute('dashboard')}>
+                <Activity size={16} /> <span style={{fontFamily:'var(--font-mono)',fontSize:'0.65rem',opacity:0.5,marginRight:'0.15rem'}}>⟩</span> Trace Dashboard
+              </button>
+              <button className={`nav-btn ${currentRoute === 'threatmap' ? 'active' : ''}`} onClick={() => setCurrentRoute('threatmap')}>
+                <Globe size={16} /> <span style={{fontFamily:'var(--font-mono)',fontSize:'0.65rem',opacity:0.5,marginRight:'0.15rem'}}>⟩</span> Threat Map
+              </button>
+              <button className={`nav-btn ${currentRoute === 'redteam' ? 'active' : ''}`} onClick={() => setCurrentRoute('redteam')}>
+                <Target size={16} /> <span style={{fontFamily:'var(--font-mono)',fontSize:'0.65rem',opacity:0.5,marginRight:'0.15rem'}}>⟩</span> Red Team Simulator
+              </button>
+              <button className={`nav-btn ${currentRoute === 'analytics' ? 'active' : ''}`} onClick={() => setCurrentRoute('analytics')}>
+                <BarChart2 size={16} /> <span style={{fontFamily:'var(--font-mono)',fontSize:'0.65rem',opacity:0.5,marginRight:'0.15rem'}}>⟩</span> Analytics
+              </button>
+            </div>
+          </nav>
+        )}
 
         <div className="app-container">
+
+          {/* ================================================================
+              LANDING PAGE
+          ================================================================ */}
+          {currentRoute === 'landing' && (
+            <LandingPage onStart={() => setCurrentRoute('dashboard')} />
+          )}
 
           {/* ================================================================
               TRACE DASHBOARD
@@ -1326,6 +1561,7 @@ function App() {
           {currentRoute === 'dashboard' && (
             <div className="animate-in">
               <header className="page-header">
+                <div style={{fontFamily:'var(--font-mono)',fontSize:'0.7rem',color:'var(--cyan)',opacity:0.6,letterSpacing:'0.25em',marginBottom:'0.5rem'}}>◄ SYSTEM_ONLINE ► // v2.0.1</div>
                 <h1 className="page-title glitch" data-text="TRUST LENS">TRUST LENS</h1>
                 <p className="page-subtitle">AI Observability &amp; Content Security Platform — trace every inference, trust decision and memory write in real time.</p>
               </header>
