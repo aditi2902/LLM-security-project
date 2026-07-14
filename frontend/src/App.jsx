@@ -95,7 +95,7 @@ const SuggestionPanel = ({ attack }) => {
     if (suggestions !== null) { setOpen(o => !o); return; }
     setLoading(true); setOpen(true);
     try {
-      const r = await fetch('http://localhost:8002/red-team-suggestions', {
+      const r = await fetch('http://localhost:8009/red-team-suggestions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ attack_text: attack.attack_text, security_response: attack.security_response }),
@@ -466,7 +466,7 @@ const AnalyticsPage = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const r = await fetch('http://localhost:8002/analytics/overview');
+      const r = await fetch('http://localhost:8009/analytics/overview');
       const d = await r.json();
       setData(d);
     } catch (e) { console.error(e); }
@@ -493,7 +493,7 @@ const AnalyticsPage = () => {
 
 client = OpenAI(
     api_key="not-needed",          # TrustLens doesn't require an OpenAI key
-    base_url="http://localhost:8002/proxy/v1",
+    base_url="http://localhost:8009/proxy/v1",
 )
 
 response = client.chat.completions.create(
@@ -503,7 +503,7 @@ response = client.chat.completions.create(
 print(response.choices[0].message.content)
 # All prompts are automatically intercepted by TrustLens`;
 
-  const curlSnippet = `curl -X POST http://localhost:8002/proxy/v1/chat/completions \\
+  const curlSnippet = `curl -X POST http://localhost:8009/proxy/v1/chat/completions \\
   -H "Content-Type: application/json" \\
   -d '{
     "model": "groq",
@@ -780,7 +780,7 @@ print(response.choices[0].message.content)
                 { name: "Ingress Guardrail", status: "ACTIVE", color: "var(--green)" },
                 { name: "Egress Validator", status: "ACTIVE", color: "var(--green)" },
                 { name: "Self-Hardening Loop", status: "ACTIVE", color: "var(--green)" },
-                { name: "Local Gateway Port", status: "8002", color: "var(--cyan)" }
+                { name: "Local Gateway Port", status: "8009", color: "var(--cyan)" }
               ].map((dev, idx) => (
                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.74rem' }}>
                   <span style={{ fontFamily: 'var(--font-ui)', color: 'var(--text-muted)' }}>{dev.name}</span>
@@ -834,9 +834,9 @@ print(response.choices[0].message.content)
           borderRadius: '6px', padding: '0.9rem 1.1rem', marginBottom: '1rem',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
           <code style={{ fontFamily: 'var(--font-mono)', fontSize: '0.9rem', color: 'var(--primary)' }}>
-            http://localhost:8002/proxy/v1
+            http://localhost:8009/proxy/v1
           </code>
-          <CopyButton text="http://localhost:8002/proxy/v1" />
+          <CopyButton text="http://localhost:8009/proxy/v1" />
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -884,7 +884,7 @@ const ThreatMapPage = () => {
 
   const fetchThreatData = async () => {
     try {
-      const res = await fetch('http://localhost:8002/analytics/threat-heatmap');
+      const res = await fetch('http://localhost:8009/analytics/threat-heatmap');
       const data = await res.json();
       if (data) {
         setGeoData(data.geo_distribution || []);
@@ -898,11 +898,11 @@ const ThreatMapPage = () => {
 
   const fetchRules = async () => {
     try {
-      const pendingRes = await fetch('http://localhost:8002/secops/rules/pending');
+      const pendingRes = await fetch('http://localhost:8009/secops/rules/pending');
       const pending = await pendingRes.json();
       setPendingRules(pending.rules || []);
 
-      const activeRes = await fetch('http://localhost:8002/secops/rules/active');
+      const activeRes = await fetch('http://localhost:8009/secops/rules/active');
       const active = await activeRes.json();
       setActiveRules(active.rules || []);
     } catch (e) {
@@ -922,7 +922,7 @@ const ThreatMapPage = () => {
 
   const handleApproveRule = async (ruleId) => {
     try {
-      const res = await fetch('http://localhost:8002/secops/rules/approve', {
+      const res = await fetch('http://localhost:8009/secops/rules/approve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rule_id: ruleId })
@@ -941,7 +941,7 @@ const ThreatMapPage = () => {
     setSimLog("Connecting to TrustLens Proxy ingress pipeline...");
     try {
       // 1. Send the query to run the pipeline
-      const queryRes = await fetch('http://localhost:8002/query', {
+      const queryRes = await fetch('http://localhost:8009/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: presetText })
@@ -951,7 +951,7 @@ const ThreatMapPage = () => {
       // 2. If it bypassed, prompt rules generation
       if (!queryData.blocked) {
         setSimLog("⚠️ BYPASS DETECTED! Threat bypassed filters. Triggering Self-Hardening loop...");
-        const ruleRes = await fetch('http://localhost:8002/secops/rules/generate', {
+        const ruleRes = await fetch('http://localhost:8009/secops/rules/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ attack_text: presetText, category: category })
@@ -1446,7 +1446,7 @@ function App() {
     formData.append('file', file);
     
     try {
-      const r = await fetch('http://localhost:8002/scan-document', {
+      const r = await fetch('http://localhost:8009/scan-document', {
         method: 'POST',
         body: formData,
       });
@@ -1473,7 +1473,7 @@ function App() {
 
   const fetchReport = async () => {
     try {
-      const r = await fetch('http://localhost:8002/red-team-report');
+      const r = await fetch('http://localhost:8009/red-team-report');
       const d = await r.json();
       setReportData(d.bypasses || []);
     } catch (e) { console.error(e); }
@@ -1482,7 +1482,7 @@ function App() {
   const triggerRedTeam = async () => {
     setLoadingRT(true); setCurrentWave(null);
     try {
-      const r = await fetch('http://localhost:8002/run-red-team', { method: 'POST' });
+      const r = await fetch('http://localhost:8009/run-red-team', { method: 'POST' });
       const d = await r.json();
       setCurrentWave(d.bypasses || []);
       await fetchReport();
@@ -1500,7 +1500,7 @@ function App() {
     if (!query.trim()) return;
     setLoading(true); setError(null); setResult(null); setActiveTab('answer');
     try {
-      const r = await fetch('http://localhost:8002/query', {
+      const r = await fetch('http://localhost:8009/query', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query }),
       });
