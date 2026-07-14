@@ -7,6 +7,13 @@ def evaluate_user_prompt(prompt: str) -> dict:
     prompt extraction, manipulation and data exfiltration attempts.
     """
 
+    # 1. Fast Path: Vector Database Semantic Cache Check
+    from agents.semantic_cache import check_semantic_cache
+    cache_result = check_semantic_cache(prompt)
+    if not cache_result.get("safe", True):
+        return cache_result
+
+    # 2. Slow Path: LLM Evaluation
     # Load dynamically learned rules from DB
     from database import db_get_learned_rules
     rules = db_get_learned_rules(limit=10)

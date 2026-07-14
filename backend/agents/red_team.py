@@ -200,6 +200,15 @@ Output ONLY valid JSON:
             if _DB_AVAILABLE:
                 rule_text = generate_learned_rule(attack_text, atk['category'])
                 added = db_add_learned_rule(attack_text, rule_text, atk['category'])
+                
+                # Add to Vector DB Semantic Cache
+                try:
+                    from agents.semantic_cache import add_attack_to_cache
+                    add_attack_to_cache(attack_text, atk['category'])
+                    print("  🧠 Added to Semantic Cache.")
+                except Exception as e:
+                    print(f"  ⚠️ Failed to add to Semantic Cache: {e}")
+                    
                 if added:
                     print(f"  🧠 Self-Hardened: Proposed new detection rule: \"{rule_text}\"")
                 else:

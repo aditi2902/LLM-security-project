@@ -59,9 +59,13 @@ def run_tests():
     for t in tests:
         print(f"\n--- Test: {t['name']} ---")
         print(f"Content: {t['content']}")
-        res = validate_and_store_memory(t['content'], t['category'], t['source'])
-        print(f"Result Action: {res.get('action')}")
-        print(f"Result Reason/Scores: {res.get('reason', res.get('scores'))}")
+        res_list = validate_and_store_memory(t['content'], t['category'], t['source'])
+        if res_list:
+            res = res_list[0]
+            print(f"Result Action: {res.get('action')}")
+            print(f"Result Reason/Scores: {res.get('reason', res.get('scores'))}")
+        else:
+            print("Result Action: Rejected (No facts extracted)")
         time.sleep(1) # Tiny sleep to avoid rate limits
     
     print("\n2️⃣ TESTING MEMORY RETRIEVAL VALIDATOR")

@@ -1,37 +1,36 @@
 import requests
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+import re
 
 def search_web(query):
-    api_key = os.getenv("SERPER_API_KEY")
-    if not api_key:
-        print("Warning: SERPER_API_KEY not found in .env. Search will fail.")
-        return []
-        
-    url = "https://google.serper.dev/search"
-    payload = {"q": query, "num": 5}
-    headers = {
-        'X-API-KEY': api_key,
-        'Content-Type': 'application/json'
-    }
-    
+    """Searches the web using Wikipedia API (reliable, free, no API key required)."""
     try:
-        import urllib3
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        response = requests.post(url, headers=headers, json=payload, verify=False, timeout=5)
+        url = "https://en.wikipedia.org/w/api.php"
+        params = {
+            "action": "query",
+            "list": "search",
+            "srsearch": query,
+            "utf8": "",
+            "format": "json",
+            "srlimit": 3
+        }
+        headers = {
+            "User-Agent": "TrustLens/1.0 (Contact: trustlens@example.com)"
+        }
+        response = requests.get(url, params=params, headers=headers, timeout=5)
         response.raise_for_status()
         data = response.json()
         
         results = []
-        for item in data.get("organic", []):
+        for item in data.get("query", {}).get("search", []):
+            # Clean HTML from snippet
+            clean_snippet = re.sub('<[^<]+?>', '', item.get("snippet", ""))
+            title = item.get("title", "")
             results.append({
-                "href": item.get("link"),
-                "title": item.get("title"),
-                "body": item.get("snippet")
+                "href": f"https://en.wikipedia.org/wiki/{title.replace(' ', '_')}",
+                "title": title,
+                "body": clean_snippet
             })
         return results
     except Exception as e:
-        print(f"Serper Search Error: {e}")
+        print(f"Wikipedia Search Error: {e}")
         return []

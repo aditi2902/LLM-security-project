@@ -18,3 +18,5 @@ groq
 sqlalchemy
 httpx
 pypdf
+chromadb
+sentence-transformers

@@ -7,6 +7,7 @@ import {
   AlertOctagon, CheckCircle2, Copy, Check, ExternalLink, Cpu,
   Globe, Paperclip
 } from 'lucide-react';
+import ThreatGlobe from './ThreatGlobe';
 import './index.css';
 
 /* ============================================================
@@ -1010,14 +1011,6 @@ const ThreatMapPage = () => {
     );
   }
 
-  // Projection math to convert lat/lon to SVG coordinates (width 720, height 360)
-  const getCoordinates = (lat, lon) => {
-    // Center is (360, 180)
-    const x = 360 + (lon / 180) * 340;
-    const y = 180 - (lat / 90) * 160;
-    return { x, y };
-  };
-
   return (
     <div className="animate-in">
       <header className="page-header">
@@ -1061,43 +1054,9 @@ const ThreatMapPage = () => {
               <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>COMMAND CONSOLE ACTIVE</span>
             </div>
             
-            <div style={{ background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(0,229,255,0.08)', borderRadius: '6px', overflow: 'hidden', height: '360px', position: 'relative' }}>
-              {/* Grid Background */}
-              <svg width="100%" height="100%" viewBox="0 0 720 360" style={{ pointerEvents: 'none' }}>
-                {/* Horizontal Grid lines */}
-                {Array.from({ length: 9 }).map((_, i) => (
-                  <line key={`h-${i}`} x1="0" y1={i * 40} x2="720" y2={i * 40} stroke="rgba(0,229,255,0.03)" strokeWidth="1" />
-                ))}
-                {/* Vertical Grid lines */}
-                {Array.from({ length: 19 }).map((_, i) => (
-                  <line key={`v-${i}`} x1={i * 40} y1="0" x2={i * 40} y2="360" stroke="rgba(0,229,255,0.03)" strokeWidth="1" />
-                ))}
-                {/* Simplified Cyber Continent outlines */}
-                {/* North America */}
-                <path d="M50,60 L240,60 L240,150 L180,180 L130,130 L100,160 L50,110 Z" fill="rgba(0,229,255,0.015)" stroke="rgba(0,229,255,0.04)" strokeWidth="1" />
-                {/* South America */}
-                <path d="M190,190 L260,190 L240,320 L210,320 L190,260 Z" fill="rgba(0,229,255,0.015)" stroke="rgba(0,229,255,0.04)" strokeWidth="1" />
-                {/* Eurasia / Africa */}
-                <path d="M300,50 L680,50 L680,160 L600,240 L530,180 L490,300 L440,300 L380,190 L320,190 Z" fill="rgba(0,229,255,0.015)" stroke="rgba(0,229,255,0.04)" strokeWidth="1" />
-                {/* Australia */}
-                <path d="M580,240 L660,250 L640,310 L570,300 Z" fill="rgba(0,229,255,0.015)" stroke="rgba(0,229,255,0.04)" strokeWidth="1" />
-
-                {/* Plot Geolocation points */}
-                {geoData.map((pt, index) => {
-                  const { x, y } = getCoordinates(pt.latitude, pt.longitude);
-                  return (
-                    <g key={`point-${index}`}>
-                      {/* Pulse effect */}
-                      <circle cx={x} cy={y} r="12" fill="none" stroke="var(--red)" strokeWidth="1.5" opacity="0.8">
-                        <animate attributeName="r" values="4;18;4" dur="2s" repeatCount="indefinite" />
-                        <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite" />
-                      </circle>
-                      {/* Anchor point */}
-                      <circle cx={x} cy={y} r="4.5" fill="var(--red)" />
-                    </g>
-                  );
-                })}
-              </svg>
+            <div style={{ background: 'radial-gradient(ellipse at 50% 40%, rgba(0,229,255,0.05) 0%, rgba(2,8,22,0.95) 70%)', border: '1px solid rgba(0,229,255,0.3)', borderRadius: '8px', overflow: 'hidden', height: '420px', position: 'relative', boxShadow: 'inset 0 0 80px rgba(0,229,255,0.03), 0 0 24px rgba(0,229,255,0.08)' }}>
+              {/* 3D Rotating Threat Globe */}
+              <ThreatGlobe geoData={geoData} />
 
               {/* Hover legend list overlay */}
               <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', display: 'flex', flexDirection: 'column', gap: '0.4rem', background: 'rgba(5,9,20,0.85)', padding: '0.5rem 0.8rem', border: '1px solid rgba(0,229,255,0.1)', borderRadius: '4px' }}>
@@ -1126,7 +1085,7 @@ const ThreatMapPage = () => {
                 const heightPct = `${(t.count / maxCount) * 100}%`;
                 return (
                   <div key={idx} style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', position: 'relative' }}>
-                    <div style={{ width: '100%', height: heightPct, background: t.count > 0 ? 'var(--red)' : 'rgba(0,229,255,0.05)', borderRadius: '2px 2px 0 0', position: 'relative' }} title={`${t.count} attacks at ${t.hour}`} />
+                    <div style={{ width: '100%', height: heightPct || '4px', background: t.count > 0 ? 'linear-gradient(to top, #cc2222, #ff5555)' : 'rgba(0,229,255,0.12)', borderRadius: '2px 2px 0 0', position: 'relative', boxShadow: t.count > 0 ? '0 0 6px rgba(255,50,50,0.5)' : 'none', minHeight: '3px' }} title={`${t.count} attacks at ${t.hour}`} />
                     <span style={{ fontSize: '0.5rem', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', marginTop: '0.2rem', transform: 'scale(0.85)' }}>{t.hour.split(':')[0]}</span>
                   </div>
                 );

@@ -87,7 +87,7 @@ cd frontend
 npm install
 npm run dev
 ```
-*(Open http://localhost:5173 to access the control center)*
+*(Open http://localhost:5175 to access the control center)*
 
 ### Option B: Containerized Setup (Docker Compose)
 If you prefer running the entire project inside containerized environments:
@@ -99,8 +99,8 @@ If you prefer running the entire project inside containerized environments:
    ```
 3. This spins up two containers:
    * **Backend**: Binds container port 8002 to host port `8002`.
-   * **Frontend**: Binds container port 5173 to host port `5173`.
-4. Access the dashboard at http://localhost:5173.
+   * **Frontend**: Binds container port 5175 to host port `5175`.
+4. Access the dashboard at http://localhost:5175.
 
 ---
 
